@@ -1,0 +1,4 @@
+GET https://administrator:administrator@192.168.0.251:8111/app/rest/projects
+### Step 1: create project
+### Step 2: create build type
+### Step 3: run build
