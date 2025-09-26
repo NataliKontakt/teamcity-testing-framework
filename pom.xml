@@ -15,6 +15,8 @@
         <testng.version>7.11.0</testng.version>
         <rest-assured.version>5.5.6</rest-assured.version>
         <lombok.version>1.18.42</lombok.version>
+        <allure-java-commons.version>2.30.0</allure-java-commons.version>
+        <allure-maven.version>2.16.1</allure-maven.version>
     </properties>
 
     <dependencies>
@@ -35,6 +37,19 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-java-commons</artifactId>
+            <version>${allure-java-commons.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-maven</artifactId>
+            <version>${allure-maven.version}</version>
+        </dependency>
     </dependencies>
+
 
 </project>
