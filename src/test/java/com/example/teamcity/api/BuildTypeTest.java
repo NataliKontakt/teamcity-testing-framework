@@ -1,5 +1,9 @@
 package com.example.teamcity.api;
 
+import com.example.teamcity.api.enums.Endpoint;
+import com.example.teamcity.api.models.User;
+import com.example.teamcity.api.requests.checked.CheckedBase;
+import com.example.teamcity.api.spec.Specifications;
 import org.testng.annotations.Test;
 
 import static io.qameta.allure.Allure.step;
@@ -7,7 +11,16 @@ import static io.qameta.allure.Allure.step;
 public class BuildTypeTest extends BaseApiTest{
     @Test(description = "User should be able to create build type", groups = {"Positive", "CRUD"})
     public void userCreatesBuildTypeTest(){
-        step("Create user");
+
+
+        step("Create user", () -> {
+            var user = User.builder()
+                    .username("name1")
+                    .password("password1")
+                    .build();
+            var requester = new CheckedBase<User>(Specifications.superUserAuth(), Endpoint.USERS);
+            requester.create(user);
+        });
         step("Create project by user");
         step("Create buildType for project");
         step("Check BuildType was created successfully wich correct data");
@@ -16,6 +29,11 @@ public class BuildTypeTest extends BaseApiTest{
     @Test(description = "User should not be able to create two build types with same id", groups = {"Negative", "CRUD"})
     public void userCreateTwosBuildTypesWithTheSameTest(){
         step("Create user");
+        /*
+        * , () -> {
+
+        }
+        * */
         step("Create project by user");
         step("Create buildType1 for project");
         step("Create buildType2 with same id as buildType1 for project");

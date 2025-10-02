@@ -17,6 +17,8 @@
         <lombok.version>1.18.42</lombok.version>
         <allure-java-commons.version>2.30.0</allure-java-commons.version>
         <allure-maven.version>2.16.1</allure-maven.version>
+        <jackson.version>2.20.0</jackson.version>
+        <jackson-annotations.version>2.20</jackson-annotations.version>
     </properties>
 
     <dependencies>
@@ -48,6 +50,24 @@
             <groupId>io.qameta.allure</groupId>
             <artifactId>allure-maven</artifactId>
             <version>${allure-maven.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson-annotations.version}</version>
         </dependency>
     </dependencies>
 
