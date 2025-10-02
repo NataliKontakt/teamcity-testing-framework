@@ -6,12 +6,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Steps extends BaseModel{
-    private Integer count;
-    private List<Step> step;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Role extends BaseModel{
+    @Builder.Default
+    private String roleId = "SYSTEM_ADMIN";
+    @Builder.Default
+    private String scope = "g";
 }

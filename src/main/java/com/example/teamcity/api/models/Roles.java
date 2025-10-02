@@ -7,11 +7,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Steps extends BaseModel{
-    private Integer count;
-    private List<Step> step;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Roles extends BaseModel{
+    private List<Role> role;
 }
