@@ -49,7 +49,54 @@ public class BuildTypeTest extends BaseApiTest{
     }
     @Test(description = "Project admin should be able to create build for their project", groups = {"Positive", "Roles"})
     public void projectAdminCreateBuildTypeTest(){
+        /*
+        Документация
+        https://www.jetbrains.com/help/teamcity/rest/serverauthsettings.html#perProjectPermissions
+        {
+  "emailVerification" : false,
+  "collapseLoginForm" : false,
+  "guestUsername" : "guest",
+  "perProjectPermissions" : true,
+  "welcomeText" : "welcomeText",
+  "allowGuest" : false,
+  "modules" : {
+    "module" : [ {
+      "name" : "name",
+      "properties" : {
+        "count" : 1,
+        "property" : [ {
+          "inherited" : true,
+          "name" : "name",
+          "type" : "type...",
+          "value" : "value"
+        } ],
+        "href" : "href"
+      }
+    } ]
+  },
+  "buildAuthenticationMode" : "strict"
+}
+        http://localhost:8111/admin/action.html
+        POST
+        -ufd-teamcity-ui-role
+Project administrator
+role
+PROJECT_ADMIN
+projectId
+CloudStorage
+roleScope
+perProject
+_replaceRoles
+assignRoles
+Assign
+tc-csrf-token
+60d295b7-c303-44c9-b978-6538767acec6
+rolesHolderId
+71
+         */
+
         step("Create user");
+        //superUserCheckRequests.getRequest(USERS).create(testData.getUser(), User.class, testData.getUser().getRoles().getRole().add("PROJECT_ADMIN"););
         step("Create project");
         step("Grant user PROJECT_ADMIN role in project");
 
