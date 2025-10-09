@@ -95,10 +95,10 @@ rolesHolderId
 71
          */
 
-        step("Create user");
+        step("Create user PROJECT_ADMIN");
         //superUserCheckRequests.getRequest(USERS).create(testData.getUser(), User.class, testData.getUser().getRoles().getRole().add("PROJECT_ADMIN"););
-        step("Create project");
-        step("Grant user PROJECT_ADMIN role in project");
+        step("Create project by user (PROJECT_ADMIN)");
+        //step("Grant user PROJECT_ADMIN role in project");
 
         step("Create buildType for project by user (PROJECT_ADMIN)");
         step("Check BuildType was created successfully");

@@ -6,8 +6,8 @@ import io.restassured.RestAssured;
 import org.testng.annotations.Test;
 
 public class DummyTest extends BaseApiTest{
-    @Test
-    public void userShouldBeAbleGetAllProjects() {
+//    @Test
+//    public void userShouldBeAbleGetAllProjects() {
 //        RestAssured
 //                .given()
 //                .spec(Specifications.getSpec().authSpec(User.builder()
@@ -15,6 +15,6 @@ public class DummyTest extends BaseApiTest{
 //                        .password("administrator")
 //                        .build()))
 //                .get("/app/rest/projects");
-
-    }
+//
+//    }
 }
