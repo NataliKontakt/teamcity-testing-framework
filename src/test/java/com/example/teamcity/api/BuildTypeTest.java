@@ -139,52 +139,36 @@ rolesHolderId
     @Test(description = "Project admin should not be able to create build for not their project", groups = {"Negative", "Roles"})
     public void projectAdminCreateBuildTypeForAnotherUserProjectTest(){
         var user1 = generate(User.class, "PROJECT_ADMIN");
-        var requesterUser1 = new CheckedBase<User>(Specifications.superUserSpec(), USERS);
-        requesterUser1.create(user1);
-        System.out.println("Create user1" + user1.getUsername());
-
+        step("Create user1", () -> {
+            var requesterUser1 = new CheckedBase<User>(Specifications.superUserSpec(), USERS);
+            requesterUser1.create(user1);
+                }
+        );
         var project1 = generate(Project.class);
         AtomicReference<String> project1Id = new AtomicReference<>("");
-
-        step("Create project by user", () -> {
+        step("Create project1 by user1", () -> {
             var requesterProject1 = new CheckedBase<Project>(Specifications.authSpec(user1), Endpoint.PROJECTS);
             project1Id.set(requesterProject1.create(project1).getId());
         });
 
-
-
-        step("Create user1");
-        step("Create project1");
         var user2 = generate(User.class, "PROJECT_ADMIN");
+        step("Create user2", () -> {
         var requesterUser2 = new CheckedBase<User>(Specifications.superUserSpec(), USERS);
         requesterUser2.create(user2);
-        System.out.println("Create user2" + user2.getUsername());
-
+        });
         var project2 = generate(Project.class);
         AtomicReference<String> project2Id = new AtomicReference<>("");
-
-        step("Create project by user", () -> {
+        step("Create project2 by user2", () -> {
             var requesterProject2 = new CheckedBase<Project>(Specifications.authSpec(user2), Endpoint.PROJECTS);
             project2Id.set(requesterProject2.create(project2).getId());
         });
 
-
-        step("Create user2");
-        step("Create project2");
-
         var buildType = generate(BuildType.class);
         buildType.setProject(Project.builder().id(project1Id.get()).locator(null).build());
-
         var requesterBuildType = new CheckedBase<BuildType>(Specifications.authSpec(user2), Endpoint.BUILD_TYPES);
         AtomicReference<String> buildTypeId = new AtomicReference<>("");
-
-        step("Create buildType for project by user", () -> {
+        step("Create buildType for project1 by user2", () -> {
             buildTypeId.set(requesterBuildType.create(buildType).getId());
         });
-
-        step("Create buildType for project1 by user2");
-        step("check BuildType2 was not created with forbidden code");
     }
-
-
 }
