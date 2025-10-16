@@ -19,6 +19,7 @@
         <allure-maven.version>2.16.1</allure-maven.version>
         <jackson.version>2.20.0</jackson.version>
         <jackson-annotations.version>2.20</jackson-annotations.version>
+        <selenide.version>7.11.1</selenide.version>
     </properties>
 
     <dependencies>
@@ -68,6 +69,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
             <version>${jackson-annotations.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.codeborne</groupId>
+            <artifactId>selenide</artifactId>
+            <version>${selenide.version}</version>
         </dependency>
     </dependencies>
 
