@@ -1,19 +1,18 @@
 package com.example.teamcity.ui;
 
-import com.example.teamcity.api.enums.Endpoint;
-import com.example.teamcity.ui.pages.LoginPage;
+import com.example.teamcity.ui.pages.admin.CreateProjectPage;
 import org.testng.annotations.Test;
 
 import static io.qameta.allure.Allure.step;
 
 @Test(groups = {"Regression"})
 public class CreateProjectTest extends BaseUiTest{
+    private static String REPO_URL = "https://github.com/NataliKontakt/Cloud-storage";
     @Test(description = "User should be able to create project", groups = {"Positive"})
     public void userCreatesProject(){
         // подготовка окружения
         step("Login as user" );
-        superUserCheckRequests.getRequest(Endpoint.USERS).create(testData.getUser());
-        LoginPage.open().login(testData.getUser());
+        loginAs(testData.getUser());
 
         // взаимодействие с UI
         step("Open create project page (http://localhost:8111/admin/createObjectMenu.html)" );
@@ -21,6 +20,9 @@ public class CreateProjectTest extends BaseUiTest{
         step("Click Proceed" );
         step("Fix Project Name and Build Type name values" );
         step("Click Proceed" );
+        CreateProjectPage.open("_Root")
+                .createForm(REPO_URL)
+                        .setupProject(testData.getProject().getName(),testData.getBuildType().getName());
 
         // проверка состояния API
         //(корректность отправки данных с UI на API)
