@@ -1,5 +1,6 @@
 package com.example.teamcity.ui.pages.admin;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.Selectors;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
@@ -13,9 +14,12 @@ public abstract class CreateBasePage extends BasePage {
     protected SelenideElement urlInput = $("#url");
     protected SelenideElement submitButton = $(Selectors.byAttribute("value", "Proceed"));
     protected SelenideElement buildTypeNameInput = $("#buildTypeName");
+    protected SelenideElement connectionSuccessfulMessage = $(".connectionSuccessful");
+
     protected void baseCreateForm(String url){
         urlInput.val(url);
         submitButton.click();
+        connectionSuccessfulMessage.should(Condition.appear, BASE_WAITING);
 
     }
 
