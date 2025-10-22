@@ -6,20 +6,18 @@ import com.example.teamcity.api.models.User;
 
 import static com.codeborne.selenide.Selenide.$;
 
-public class LoginPage extends BasePage {
+public class LoginPage extends BasePage{
     private static final String LOGIN_URL = "/login.html";
 
     private SelenideElement inputUsername = $("#username");
     private SelenideElement inputPassword = $("#password");
     private SelenideElement inputSubmitLogin = $(".loginButton");
 
-    public SelenideElement inputSubmitLogin2 = $(".loginButton");
-
-    public static LoginPage open () {
+    public static LoginPage open(){
         return Selenide.open(LOGIN_URL, LoginPage.class);
     }
 
-    public ProjectsPage login(User user) {
+    public ProjectsPage login(User user){
         // Метод val вместо clear, sendKeys
         inputUsername.val(user.getUsername());
         inputPassword.val(user.getPassword());
