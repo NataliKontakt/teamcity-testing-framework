@@ -142,9 +142,12 @@ rolesHolderId
         var user1 = generate(User.class, "PROJECT_ADMIN");
         String password = user1.getPassword();
         var requesterUser1 = new CheckedBase<User>(Specifications.superUserSpec(), USERS);
+        //сохраняем полученный объект, чтобы потом достать id и поменять поле scope
         user1 = requesterUser1.create(user1);
+        //сохраняем пароль, т.к. в ответе он приходит = null
         user1.setPassword(password);
         System.out.println(user1.toString());
+        //сохраняем в финальную переменную, т.к. authSpec не принимает просто user1
         final var projectAdmin1 = user1;
 
         var project1 = generate(Project.class);
