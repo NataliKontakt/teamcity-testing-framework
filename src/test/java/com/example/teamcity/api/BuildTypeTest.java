@@ -3,6 +3,7 @@ package com.example.teamcity.api;
 import com.example.teamcity.api.enums.Endpoint;
 import com.example.teamcity.api.models.BuildType;
 import com.example.teamcity.api.models.Project;
+import com.example.teamcity.api.models.Roles;
 import com.example.teamcity.api.models.User;
 import com.example.teamcity.api.requests.CheckedRequests;
 import com.example.teamcity.api.requests.checked.CheckedBase;
@@ -139,34 +140,48 @@ rolesHolderId
     @Test(description = "Project admin should not be able to create build for not their project", groups = {"Negative", "Roles"})
     public void projectAdminCreateBuildTypeForAnotherUserProjectTest(){
         var user1 = generate(User.class, "PROJECT_ADMIN");
+        String password = user1.getPassword();
         var requesterUser1 = new CheckedBase<User>(Specifications.superUserSpec(), USERS);
-        requesterUser1.create(user1);
-        System.out.println("Create user1" + user1.getUsername());
+        user1 = requesterUser1.create(user1);
+        user1.setPassword(password);
+        System.out.println(user1.toString());
+        final var projectAdmin1 = user1;
 
         var project1 = generate(Project.class);
         AtomicReference<String> project1Id = new AtomicReference<>("");
 
         step("Create project by user", () -> {
-            var requesterProject1 = new CheckedBase<Project>(Specifications.authSpec(user1), Endpoint.PROJECTS);
+            var requesterProject1 = new CheckedBase<Project>(Specifications.authSpec(projectAdmin1), Endpoint.PROJECTS);
             project1Id.set(requesterProject1.create(project1).getId());
         });
+        System.out.println("назначаем проект пользователю 1");
+        projectAdmin1.getRoles().getRole().get(0).setScope("p:" + project1Id.get());
+        requesterUser1.update(projectAdmin1.getId(), projectAdmin1);
+
 
 
 
         step("Create user1");
         step("Create project1");
         var user2 = generate(User.class, "PROJECT_ADMIN");
+        String password2 = user2.getPassword();
         var requesterUser2 = new CheckedBase<User>(Specifications.superUserSpec(), USERS);
-        requesterUser2.create(user2);
-        System.out.println("Create user2" + user2.getUsername());
+        user2 = requesterUser2.create(user2);
+        user2.setPassword(password2);
+        System.out.println(user2.toString());
+        final var projectAdmin2 = user2;
+
 
         var project2 = generate(Project.class);
         AtomicReference<String> project2Id = new AtomicReference<>("");
 
         step("Create project by user", () -> {
-            var requesterProject2 = new CheckedBase<Project>(Specifications.authSpec(user2), Endpoint.PROJECTS);
+            var requesterProject2 = new CheckedBase<Project>(Specifications.authSpec(projectAdmin2), Endpoint.PROJECTS);
             project2Id.set(requesterProject2.create(project2).getId());
         });
+        System.out.println("назначаем проект пользователю 2");
+        projectAdmin2.getRoles().getRole().get(0).setScope("p:" + project2Id.get());
+        requesterUser2.update(projectAdmin2.getId(), projectAdmin2);
 
 
         step("Create user2");
@@ -175,7 +190,7 @@ rolesHolderId
         var buildType = generate(BuildType.class);
         buildType.setProject(Project.builder().id(project1Id.get()).locator(null).build());
 
-        var requesterBuildType = new CheckedBase<BuildType>(Specifications.authSpec(user2), Endpoint.BUILD_TYPES);
+        var requesterBuildType = new CheckedBase<BuildType>(Specifications.authSpec(projectAdmin2), Endpoint.BUILD_TYPES);
         AtomicReference<String> buildTypeId = new AtomicReference<>("");
 
         step("Create buildType for project by user", () -> {
