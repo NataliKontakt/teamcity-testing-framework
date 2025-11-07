@@ -59,26 +59,20 @@ public class BuildTypeTest extends BaseApiTest {
         var project = generate(Project.class);
         AtomicReference<String> projectId = new AtomicReference<>("");
 
-        step("Create project by user", () -> {
-            var requester = new CheckedBase<Project>(Specifications.authSpec(user), Endpoint.PROJECTS);
-            projectId.set(requester.create(project).getId());
-        });
+        var requesterProject = new CheckedBase<Project>(Specifications.authSpec(user), Endpoint.PROJECTS);
+        projectId.set(requesterProject.create(project).getId());
 
         var buildType = generate(BuildType.class);
         buildType.setProject(Project.builder().id(projectId.get()).locator(null).build());
 
-        var requester = new CheckedBase<BuildType>(Specifications.authSpec(user), Endpoint.BUILD_TYPES);
+        var requesterBuildType = new CheckedBase<BuildType>(Specifications.authSpec(user), Endpoint.BUILD_TYPES);
         AtomicReference<String> buildTypeId = new AtomicReference<>("");
 
-        step("Create buildType for project by user", () -> {
-            buildTypeId.set(requester.create(buildType).getId());
-        });
+        buildTypeId.set(requesterBuildType.create(buildType).getId());
 
-        step("Check buildType was created successfully", () -> {
-            var createdBuildType = requester.read(buildTypeId.get());
+        var createdBuildType = requesterBuildType.read(buildTypeId.get());
 
-            softy.assertEquals(buildType.getName(), createdBuildType.getName(), "Build type name is not correct");
-        });
+        softy.assertEquals(buildType.getName(), createdBuildType.getName(), "Build type name is not correct");
     }
 
     @Test(description = "Project admin should not be able to create build for not their project", groups = {"Negative", "Roles"})
