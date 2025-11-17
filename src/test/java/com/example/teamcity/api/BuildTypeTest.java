@@ -18,10 +18,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.example.teamcity.api.enums.Endpoint.*;
 import static com.example.teamcity.api.generators.TestDataGenerator.generate;
 import static io.qameta.allure.Allure.step;
+
 @Test(groups = {"Regression"})
-public class BuildTypeTest extends BaseApiTest{
+public class BuildTypeTest extends BaseApiTest {
     @Test(description = "User should be able to create build type", groups = {"Positive", "CRUD"})
-    public void userCreatesBuildTypeTest(){
+    public void userCreatesBuildTypeTest() {
         superUserCheckRequests.getRequest(USERS).create(testData.getUser());
         var userCheckRequests = new CheckedRequests(Specifications.authSpec(testData.getUser()));
 
@@ -35,14 +36,12 @@ public class BuildTypeTest extends BaseApiTest{
     }
 
     @Test(description = "User should not be able to create two build types with same id", groups = {"Negative", "CRUD"})
-    public void userCreateTwosBuildTypesWithTheSameTest(){
-        var buildTypeWithSameId = generate(Arrays.asList(testData.getProject()),BuildType.class, testData.getBuildType().getId());
+    public void userCreateTwosBuildTypesWithTheSameTest() {
+        var buildTypeWithSameId = generate(Arrays.asList(testData.getProject()), BuildType.class, testData.getBuildType().getId());
 
         superUserCheckRequests.getRequest(USERS).create(testData.getUser());
         var userCheckRequests = new CheckedRequests(Specifications.authSpec(testData.getUser()));
         userCheckRequests.<Project>getRequest(PROJECTS).create(testData.getProject());
-
-
 
         userCheckRequests.getRequest(BUILD_TYPES).create(testData.getBuildType());
         new UncheckedBase(Specifications.authSpec(testData.getUser()), BUILD_TYPES)
@@ -50,8 +49,9 @@ public class BuildTypeTest extends BaseApiTest{
                 .then().assertThat().statusCode(HttpStatus.SC_BAD_REQUEST)
                 .body("errors[0].message", Matchers.containsString("The build configuration / template ID \"%s\" is already used by another configuration or template".formatted(testData.getBuildType().getId())));
     }
+
     @Test(description = "Project admin should be able to create build for their project", groups = {"Positive", "Roles"})
-    public void projectAdminCreateBuildTypeTest(){
+    public void projectAdminCreateBuildTypeTest() {
         var user = generate(User.class, "PROJECT_ADMIN");
         var requesterUser = new CheckedBase<User>(Specifications.superUserSpec(), USERS);
         requesterUser.create(user);
@@ -59,132 +59,73 @@ public class BuildTypeTest extends BaseApiTest{
         var project = generate(Project.class);
         AtomicReference<String> projectId = new AtomicReference<>("");
 
-        step("Create project by user", () -> {
-            var requester = new CheckedBase<Project>(Specifications.authSpec(user), Endpoint.PROJECTS);
-            projectId.set(requester.create(project).getId());
-        });
+        var requesterProject = new CheckedBase<Project>(Specifications.authSpec(user), Endpoint.PROJECTS);
+        projectId.set(requesterProject.create(project).getId());
 
         var buildType = generate(BuildType.class);
         buildType.setProject(Project.builder().id(projectId.get()).locator(null).build());
 
-        var requester = new CheckedBase<BuildType>(Specifications.authSpec(user), Endpoint.BUILD_TYPES);
+        var requesterBuildType = new CheckedBase<BuildType>(Specifications.authSpec(user), Endpoint.BUILD_TYPES);
         AtomicReference<String> buildTypeId = new AtomicReference<>("");
 
-        step("Create buildType for project by user", () -> {
-            buildTypeId.set(requester.create(buildType).getId());
-        });
+        buildTypeId.set(requesterBuildType.create(buildType).getId());
 
-        step("Check buildType was created successfully", () ->  {
-            var createdBuildType = requester.read(buildTypeId.get());
+        var createdBuildType = requesterBuildType.read(buildTypeId.get());
 
-            softy.assertEquals(buildType.getName(), createdBuildType.getName(), "Build type name is not correct");
-        });
-
-
-        /*
-        Документация
-        https://www.jetbrains.com/help/teamcity/rest/serverauthsettings.html#perProjectPermissions
-        {
-  "emailVerification" : false,
-  "collapseLoginForm" : false,
-  "guestUsername" : "guest",
-  "perProjectPermissions" : true,
-  "welcomeText" : "welcomeText",
-  "allowGuest" : false,
-  "modules" : {
-    "module" : [ {
-      "name" : "name",
-      "properties" : {
-        "count" : 1,
-        "property" : [ {
-          "inherited" : true,
-          "name" : "name",
-          "type" : "type...",
-          "value" : "value"
-        } ],
-        "href" : "href"
-      }
-    } ]
-  },
-  "buildAuthenticationMode" : "strict"
-}
-        http://localhost:8111/admin/action.html
-        POST
-        -ufd-teamcity-ui-role
-Project administrator
-role
-PROJECT_ADMIN
-projectId
-CloudStorage
-roleScope
-perProject
-_replaceRoles
-assignRoles
-Assign
-tc-csrf-token
-60d295b7-c303-44c9-b978-6538767acec6
-rolesHolderId
-71
-         */
-
-        step("Create user (PROJECT_ADMIN)" );
-        //superUserCheckRequests.getRequest(USERS).create(testData.getUser(), User.class, testData.getUser().getRoles().getRole().add("PROJECT_ADMIN"););
-        step("Create project");
-        step("Grant user PROJECT_ADMIN role in project");
-
-        step("Create buildType for project by user (PROJECT_ADMIN)");
-        step("Check BuildType was created successfully");
+        softy.assertEquals(buildType.getName(), createdBuildType.getName(), "Build type name is not correct");
     }
 
     @Test(description = "Project admin should not be able to create build for not their project", groups = {"Negative", "Roles"})
-    public void projectAdminCreateBuildTypeForAnotherUserProjectTest(){
+    public void projectAdminCreateBuildTypeForAnotherUserProjectTest() {
         var user1 = generate(User.class, "PROJECT_ADMIN");
+        String password = user1.getPassword();
         var requesterUser1 = new CheckedBase<User>(Specifications.superUserSpec(), USERS);
-        requesterUser1.create(user1);
-        System.out.println("Create user1" + user1.getUsername());
+        //сохраняем полученный объект, чтобы потом достать id и поменять поле scope
+        user1 = requesterUser1.create(user1);
+        //сохраняем пароль, т.к. в ответе он приходит = null
+        user1.setPassword(password);
+        System.out.println(user1.toString());
+        //сохраняем в финальную переменную, т.к. authSpec не принимает просто user1
+        final var projectAdmin1 = user1;
 
         var project1 = generate(Project.class);
         AtomicReference<String> project1Id = new AtomicReference<>("");
 
-        step("Create project by user", () -> {
-            var requesterProject1 = new CheckedBase<Project>(Specifications.authSpec(user1), Endpoint.PROJECTS);
-            project1Id.set(requesterProject1.create(project1).getId());
-        });
+        var requesterProject1 = new CheckedBase<Project>(Specifications.authSpec(projectAdmin1), Endpoint.PROJECTS);
+        project1Id.set(requesterProject1.create(project1).getId());
 
 
+        projectAdmin1.getRoles().getRole().get(0).setScope("p:" + project1Id.get());
+        requesterUser1.update(projectAdmin1.getId(), projectAdmin1);
 
-        step("Create user1");
-        step("Create project1");
         var user2 = generate(User.class, "PROJECT_ADMIN");
+        String password2 = user2.getPassword();
         var requesterUser2 = new CheckedBase<User>(Specifications.superUserSpec(), USERS);
-        requesterUser2.create(user2);
-        System.out.println("Create user2" + user2.getUsername());
+        user2 = requesterUser2.create(user2);
+        user2.setPassword(password2);
+        System.out.println(user2.toString());
+        final var projectAdmin2 = user2;
 
         var project2 = generate(Project.class);
         AtomicReference<String> project2Id = new AtomicReference<>("");
+        var requesterProject2 = new CheckedBase<Project>(Specifications.authSpec(projectAdmin2), Endpoint.PROJECTS);
+        project2Id.set(requesterProject2.create(project2).getId());
 
-        step("Create project by user", () -> {
-            var requesterProject2 = new CheckedBase<Project>(Specifications.authSpec(user2), Endpoint.PROJECTS);
-            project2Id.set(requesterProject2.create(project2).getId());
-        });
-
-
-        step("Create user2");
-        step("Create project2");
+        projectAdmin2.getRoles().getRole().get(0).setScope("p:" + project2Id.get());
+        requesterUser2.update(projectAdmin2.getId(), projectAdmin2);
 
         var buildType = generate(BuildType.class);
         buildType.setProject(Project.builder().id(project1Id.get()).locator(null).build());
 
-        var requesterBuildType = new CheckedBase<BuildType>(Specifications.authSpec(user2), Endpoint.BUILD_TYPES);
-        AtomicReference<String> buildTypeId = new AtomicReference<>("");
+        new CheckedBase<BuildType>(Specifications.authSpec(projectAdmin2), Endpoint.BUILD_TYPES);
 
-        step("Create buildType for project by user", () -> {
-            buildTypeId.set(requesterBuildType.create(buildType).getId());
-        });
-
-        step("Create buildType for project1 by user2");
-        step("check BuildType2 was not created with forbidden code");
+        new UncheckedBase(Specifications.authSpec(projectAdmin2), BUILD_TYPES)
+                .create(buildType)
+                .then().assertThat().statusCode(HttpStatus.SC_FORBIDDEN)
+                .body("errors[0].message", Matchers.containsString(
+                        "You do not have enough permissions to edit project with id: %s"
+                                .formatted(project1Id.get())
+                ));
     }
-
 
 }
